@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>DOMINION</title>
+  
+  <meta name="theme-color" content="#090808">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Syne:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/feather-icons"></script>
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div id="app-container">
+    <!-- Top Bar (Hidden on Splash and Onboarding) -->
+    <header id="topbar" class="hidden">
+      <div class="topbar-left">
+        <span class="wordmark-small">DOMIN<span class="text-orange">I</span>ON</span>
+      </div>
+      <div class="topbar-right">
+        <button id="btn-settings" class="icon-btn">
+          <i data-feather="settings"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      <!-- Screens will be injected here via app.js -->
+    </main>
+
+    <!-- Bottom Navigation (Hidden on Splash, Onboarding, and SOS Flow) -->
+    <nav id="bottom-nav" class="hidden">
+      <button class="nav-item active" data-target="home">
+        <i data-feather="home"></i>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" data-target="mission">
+        <i data-feather="target"></i>
+        <span>Mission</span>
+      </button>
+      <button class="nav-item" data-target="journey">
+        <i data-feather="trending-up"></i>
+        <span>Journey</span>
+      </button>
+      <button class="nav-item" data-target="settings-page">
+        <i data-feather="settings"></i>
+        <span>Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
