@@ -162,8 +162,8 @@ function renderOnboarding() {
         <div class="card selectable" data-val="Masturbation">
           <h3 class="mb-1">🔴 Masturbation</h3>
         </div>
-        <div class="card selectable" data-val="Ambas">
-          <h3 class="mb-1">🔴 Ambas</h3>
+        <div class="card selectable" data-val="Both">
+          <h3 class="mb-1">🔴 Both</h3>
         </div>
         
         <button id="btn-next" class="btn btn-primary mt-auto" style="opacity: 0.5; pointer-events: none;">This is my battle</button>
@@ -176,12 +176,12 @@ function renderOnboarding() {
         <select id="country-select" style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color); margin-bottom: 2rem;">
           <option value="" disabled selected>Select a country...</option>
           <option value="🇺🇸 United States">United States</option>
-          <option value="🇲🇽 Mexico">México</option>
+          <option value="🇲🇽 Mexico">Mexico</option>
           <option value="🇨🇴 Colombia">Colombia</option>
           <option value="🇦🇷 Argentina">Argentina</option>
-          <option value="🇪🇸 Spain">España</option>
+          <option value="🇪🇸 Spain">Spain</option>
           <option value="🇨🇱 Chile">Chile</option>
-          <option value="🇵🇪 Peru">Perú</option>
+          <option value="🇵🇪 Peru">Peru</option>
           <option value="🌎 Other">Other</option>
         </select>
 
@@ -235,8 +235,8 @@ function renderOnboarding() {
         if (e.target.value) {
           btnNext.style.opacity = '1';
           btnNext.style.pointerEvents = 'auto';
-          // Extract emoji (first 2 chars normally for flags)
-          emojiDiv.innerText = e.target.value.substring(0, 2).trim(); 
+          // Extract emoji
+          emojiDiv.innerText = e.target.value.split(" ")[0]; 
         }
       });
 
