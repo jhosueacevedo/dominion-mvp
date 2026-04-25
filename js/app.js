@@ -7,6 +7,7 @@ const defaultState = {
   isFirstLaunch: true,
   battles: [], // 'pornography', 'masturbation', 'ambas'
   country: null,
+  userId: null,
   why: '',
   startDate: null,
   currentStreak: 0,
@@ -21,6 +22,11 @@ const defaultState = {
 };
 
 let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { ...defaultState };
+
+if (!appState.userId) {
+  appState.userId = 'user-' + Math.random().toString(36).substring(2, 6).toLowerCase() + Math.floor(Math.random() * 99);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+}
 
 function saveState() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
@@ -166,7 +172,10 @@ function renderOnboarding() {
           <h3 class="mb-1">🔴 Both</h3>
         </div>
         
-        <button id="btn-next" class="btn btn-primary mt-auto" style="opacity: 0.5; pointer-events: none;">This is my battle</button>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">This is my battle</button>
+        </div>
       `;
     } else if (step === 3) {
       container.innerHTML = `
@@ -187,7 +196,10 @@ function renderOnboarding() {
 
         <div id="country-emoji" style="font-size: 5rem; text-align: center; margin-bottom: 2rem; min-height: 80px;"></div>
 
-        <button id="btn-next" class="btn btn-primary mt-auto" style="opacity: 0.5; pointer-events: none;">Continue</button>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
+        </div>
       `;
     } else if (step === 4) {
       container.innerHTML = `
@@ -196,7 +208,10 @@ function renderOnboarding() {
         
         <textarea id="why-input" rows="4" placeholder="Write your reason here..." maxlength="140"></textarea>
         
-        <button id="btn-next" class="btn btn-primary mt-auto" style="opacity: 0.5; pointer-events: none;">This is my why</button>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">This is my why</button>
+        </div>
       `;
     }
 
@@ -207,6 +222,8 @@ function renderOnboarding() {
       document.getElementById('btn-next').addEventListener('click', () => { step++; updateStep(); });
     } else if (step === 2) {
       const btnNext = document.getElementById('btn-next');
+      document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
+      
       document.querySelectorAll('.selectable').forEach(el => {
         el.addEventListener('click', () => {
           el.classList.toggle('selected');
@@ -231,6 +248,8 @@ function renderOnboarding() {
       const btnNext = document.getElementById('btn-next');
       const emojiDiv = document.getElementById('country-emoji');
       
+      document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
+      
       select.addEventListener('change', (e) => {
         if (e.target.value) {
           btnNext.style.opacity = '1';
@@ -248,6 +267,8 @@ function renderOnboarding() {
     } else if (step === 4) {
       const whyInput = document.getElementById('why-input');
       const btnNext = document.getElementById('btn-next');
+      
+      document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
       
       whyInput.addEventListener('input', (e) => {
         if (e.target.value.trim().length > 0) {
@@ -616,6 +637,11 @@ function renderSettings() {
   mainContent.innerHTML = `
     <div class="screen">
       <h2 class="mb-4">Settings</h2>
+
+      <div class="card text-left mb-2">
+        <span class="card-label">Anonymous User ID</span>
+        <p style="font-family: monospace; font-size: 1.1rem; color: var(--text-white);">${appState.userId}</p>
+      </div>
       
       <div class="card text-left mb-2">
         <span class="card-label">Your Battle</span>
