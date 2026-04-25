@@ -5,7 +5,8 @@ const STORAGE_KEY = 'dominion_data';
 
 const defaultState = {
   isFirstLaunch: true,
-  battles: [], // 'pornography', 'masturbation'
+  battles: [], // 'pornography', 'masturbation', 'ambas'
+  country: null,
   why: '',
   startDate: null,
   currentStreak: 0,
@@ -161,10 +162,34 @@ function renderOnboarding() {
         <div class="card selectable" data-val="Masturbation">
           <h3 class="mb-1">🔴 Masturbation</h3>
         </div>
+        <div class="card selectable" data-val="Ambas">
+          <h3 class="mb-1">🔴 Ambas</h3>
+        </div>
         
         <button id="btn-next" class="btn btn-primary mt-auto" style="opacity: 0.5; pointer-events: none;">This is my battle</button>
       `;
     } else if (step === 3) {
+      container.innerHTML = `
+        <h1 class="mb-2">Where are you fighting from?</h1>
+        <p class="mb-4">Select your country to stand with warriors globally.</p>
+        
+        <select id="country-select" style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color); margin-bottom: 2rem;">
+          <option value="" disabled selected>Select a country...</option>
+          <option value="🇺🇸 United States">United States</option>
+          <option value="🇲🇽 Mexico">México</option>
+          <option value="🇨🇴 Colombia">Colombia</option>
+          <option value="🇦🇷 Argentina">Argentina</option>
+          <option value="🇪🇸 Spain">España</option>
+          <option value="🇨🇱 Chile">Chile</option>
+          <option value="🇵🇪 Peru">Perú</option>
+          <option value="🌎 Other">Other</option>
+        </select>
+
+        <div id="country-emoji" style="font-size: 5rem; text-align: center; margin-bottom: 2rem; min-height: 80px;"></div>
+
+        <button id="btn-next" class="btn btn-primary mt-auto" style="opacity: 0.5; pointer-events: none;">Continue</button>
+      `;
+    } else if (step === 4) {
       container.innerHTML = `
         <h1 class="mb-2">Why do you want to change?</h1>
         <p class="mb-4">Your reason is your anchor. It will appear when you need it most.</p>
@@ -202,6 +227,25 @@ function renderOnboarding() {
       });
       btnNext.addEventListener('click', () => { step++; updateStep(); });
     } else if (step === 3) {
+      const select = document.getElementById('country-select');
+      const btnNext = document.getElementById('btn-next');
+      const emojiDiv = document.getElementById('country-emoji');
+      
+      select.addEventListener('change', (e) => {
+        if (e.target.value) {
+          btnNext.style.opacity = '1';
+          btnNext.style.pointerEvents = 'auto';
+          // Extract emoji (first 2 chars normally for flags)
+          emojiDiv.innerText = e.target.value.substring(0, 2).trim(); 
+        }
+      });
+
+      btnNext.addEventListener('click', () => { 
+        appState.country = select.value;
+        step++; 
+        updateStep(); 
+      });
+    } else if (step === 4) {
       const whyInput = document.getElementById('why-input');
       const btnNext = document.getElementById('btn-next');
       
