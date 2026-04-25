@@ -670,9 +670,21 @@ function renderSettings() {
         DOMINION is a wellness and accountability app, not a medical or clinical service. It does not diagnose, treat, or replace professional care. If you are struggling with a serious condition, please consult a qualified professional.
       </div>
       
+      <button class="btn btn-ghost mt-4 mb-4" id="btn-reset-test" style="border-color: var(--danger-color); color: var(--danger-color);">Reset Progress (Testing)</button>
+      
       <p class="text-center text-muted" style="font-size:0.8rem; margin-top:1rem;">App Version: 1.0.0 (MVP)</p>
     </div>
   `;
+
+  // Attach event listener
+  document.getElementById('btn-reset-test').addEventListener('click', () => {
+    const currentUserId = appState.userId;
+    appState = { ...defaultState };
+    appState.userId = currentUserId; // preserve testing ID
+    appState.isFirstLaunch = true;
+    saveState();
+    navigateTo('onboarding');
+  });
 }
 
 // Boot up
