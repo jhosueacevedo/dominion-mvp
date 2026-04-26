@@ -5,8 +5,12 @@ const STORAGE_KEY = 'dominion_data';
 
 const defaultState = {
   isFirstLaunch: true,
-  battles: [], // 'pornography', 'masturbation', 'ambas'
+  age: null,
   country: null,
+  relationship: null,
+  battles: [],
+  frequency: null,
+  feelings: [],
   userId: null,
   why: '',
   startDate: null,
@@ -144,45 +148,45 @@ function renderSplash() {
 // 2. Onboarding
 function renderOnboarding() {
   let step = 1;
-  const selections = [];
+  const data = {
+    age: null,
+    country: null,
+    relationship: null,
+    battles: [],
+    frequency: null,
+    feelings: [],
+    why: ''
+  };
 
   const updateStep = () => {
     mainContent.innerHTML = '';
     const container = document.createElement('div');
     container.className = 'screen justify-center';
     
-    if (step === 1) {
+    // UI Templates
+    if (step === 1) { // Intro
       container.innerHTML = `
         <h1 class="text-center">Your Life.<br>Your Purpose.<br>Your Dominion.</h1>
         <p class="text-center mt-4 mb-4">A daily system built to help you become who you were always called to be.</p>
         <button id="btn-next" class="btn btn-primary mt-auto">Get Started</button>
       `;
-    } else if (step === 2) {
+    } else if (step === 2) { // Age
       container.innerHTML = `
-        <h1 class="mb-2">What are you fighting?</h1>
-        <p class="mb-4">Be honest. This personalizes your entire experience.</p>
-        
-        <div class="card selectable" data-val="Pornography">
-          <h3 class="mb-1">🔴 Pornography</h3>
-        </div>
-        <div class="card selectable" data-val="Masturbation">
-          <h3 class="mb-1">🔴 Masturbation</h3>
-        </div>
-        <div class="card selectable" data-val="Both">
-          <h3 class="mb-1">🔴 Both</h3>
-        </div>
-        
+        <h1 class="mb-2">How old are you?</h1>
+        <div class="card selectable" data-val="18-24"><h3 class="mb-1">18–24</h3></div>
+        <div class="card selectable" data-val="25-34"><h3 class="mb-1">25–34</h3></div>
+        <div class="card selectable" data-val="35-44"><h3 class="mb-1">35–44</h3></div>
+        <div class="card selectable" data-val="45+"><h3 class="mb-1">45+</h3></div>
         <div class="flex gap-2 mt-auto">
           <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
-          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">This is my battle</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
         </div>
       `;
-    } else if (step === 3) {
+    } else if (step === 3) { // Country
       container.innerHTML = `
         <h1 class="mb-2">Where are you fighting from?</h1>
-        <p class="mb-4">Select your country to stand with warriors globally.</p>
-        
-        <select id="country-select" style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color); margin-bottom: 2rem;">
+        <p class="mb-4">Select your location.</p>
+        <select id="country-select" style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color); margin-bottom: 0.5rem;">
           <option value="" disabled selected>Select a country...</option>
           <option value="🇺🇸 United States">United States</option>
           <option value="🇲🇽 Mexico">Mexico</option>
@@ -191,83 +195,188 @@ function renderOnboarding() {
           <option value="🇪🇸 Spain">Spain</option>
           <option value="🇨🇱 Chile">Chile</option>
           <option value="🇵🇪 Peru">Peru</option>
-          <option value="🌎 Other">Other</option>
+          <option value="Other">Other</option>
         </select>
-
-        <div id="country-emoji" style="font-size: 5rem; text-align: center; margin-bottom: 2rem; min-height: 80px;"></div>
-
+        <input type="text" id="country-other" class="hidden mt-2" placeholder="Type your country...">
+        <div id="country-emoji" style="font-size: 5rem; text-align: center; margin-top: 1rem; margin-bottom: 2rem; min-height: 80px;"></div>
         <div class="flex gap-2 mt-auto">
           <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
           <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
         </div>
       `;
-    } else if (step === 4) {
+    } else if (step === 4) { // Relationship
       container.innerHTML = `
-        <h1 class="mb-2">Why do you want to change?</h1>
-        <p class="mb-4">Your reason is your anchor. It will appear when you need it most.</p>
-        
-        <textarea id="why-input" rows="4" placeholder="Write your reason here..." maxlength="140"></textarea>
-        
+        <h1 class="mb-2">What's your relationship status?</h1>
+        <div class="card selectable" data-val="Single"><h3 class="mb-1">Single</h3></div>
+        <div class="card selectable" data-val="In a relationship"><h3 class="mb-1">In a relationship</h3></div>
+        <div class="card selectable" data-val="Engaged"><h3 class="mb-1">Engaged</h3></div>
+        <div class="card selectable" data-val="Married"><h3 class="mb-1">Married</h3></div>
+        <div class="card selectable" data-val="Divorced / Separated"><h3 class="mb-1">Divorced / Separated</h3></div>
         <div class="flex gap-2 mt-auto">
           <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
-          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">This is my why</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
+        </div>
+      `;
+    } else if (step === 5) { // Battle
+      container.innerHTML = `
+        <h1 class="mb-2">What are you fighting?</h1>
+        <p class="mb-4">Be honest. No one is watching.</p>
+        <div class="card selectable" data-val="Pornography"><h3 class="mb-1">🔴 Pornography</h3></div>
+        <div class="card selectable" data-val="Masturbation"><h3 class="mb-1">🔴 Masturbation</h3></div>
+        <div class="card selectable" data-val="Both"><h3 class="mb-1">🔴 Both</h3></div>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
+        </div>
+      `;
+    } else if (step === 6) { // Frequency
+      container.innerHTML = `
+        <h1 class="mb-2">How often does this happen?</h1>
+        <p class="mb-4">There's no wrong answer here.</p>
+        <div class="card selectable" data-val="Every day"><h3 class="mb-1">Every day</h3></div>
+        <div class="card selectable" data-val="Several times a week"><h3 class="mb-1">Several times a week</h3></div>
+        <div class="card selectable" data-val="Once a week or less"><h3 class="mb-1">Once a week or less</h3></div>
+        <div class="card selectable" data-val="I relapsed recently and want to restart"><h3 class="mb-1">I relapsed recently and want to restart</h3></div>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
+        </div>
+      `;
+    } else if (step === 7) { // Feelings
+      container.innerHTML = `
+        <h1 class="mb-2">How does this make you feel?</h1>
+        <p class="mb-4">Select all that apply.</p>
+        <div class="card selectable-multi" data-val="Ashamed"><h3 class="mb-1">😔 Ashamed</h3></div>
+        <div class="card selectable-multi" data-val="Frustrated with myself"><h3 class="mb-1">😤 Frustrated with myself</h3></div>
+        <div class="card selectable-multi" data-val="Out of control"><h3 class="mb-1">😰 Out of control</h3></div>
+        <div class="card selectable-multi" data-val="Numb"><h3 class="mb-1">😶 Numb — I don't feel much anymore</h3></div>
+        <div class="card selectable-multi" data-val="Letting people down"><h3 class="mb-1">😟 Like I'm letting people down</h3></div>
+        <div class="card selectable-multi" data-val="Stuck"><h3 class="mb-1">😞 Stuck in a cycle I can't break</h3></div>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
+        </div>
+      `;
+    } else if (step === 8) { // Why
+      container.innerHTML = `
+        <h1 class="mb-2">Why do you want to change?</h1>
+        <p class="mb-4">This will appear when you need it most.</p>
+        <textarea id="why-input" rows="4" placeholder="Write your reason here..." maxlength="140"></textarea>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
+        </div>
+      `;
+    } else if (step === 9) { // Disclaimer
+      container.innerHTML = `
+        <h1 class="mb-4">Before you begin...</h1>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem;">DOMINION is not easy. It will ask something of you every day. Some days you will fail. That's part of it. What matters is that you come back.</p>
+        <div class="flex gap-2 mt-auto">
+          <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
+          <button id="btn-next" class="btn btn-primary" style="flex:2;">I'm ready. Let's begin.</button>
         </div>
       `;
     }
 
     mainContent.appendChild(container);
 
-    // Step Logic
+    // Logic Handlers
+    const bindSingleSelect = (fieldKey) => {
+      const btnNext = document.getElementById('btn-next');
+      document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
+      document.querySelectorAll('.selectable').forEach(el => {
+        el.addEventListener('click', () => {
+          document.querySelectorAll('.selectable').forEach(x => x.classList.remove('selected'));
+          el.classList.add('selected');
+          
+          if (fieldKey === 'battles') {
+            data[fieldKey] = [el.dataset.val];
+          } else {
+            data[fieldKey] = el.dataset.val;
+          }
+          
+          btnNext.style.opacity = '1';
+          btnNext.style.pointerEvents = 'auto';
+        });
+      });
+      btnNext.addEventListener('click', () => { step++; updateStep(); });
+    };
+
     if (step === 1) {
       document.getElementById('btn-next').addEventListener('click', () => { step++; updateStep(); });
-    } else if (step === 2) {
+    } else if (step === 2) { // Age
+      bindSingleSelect('age');
+    } else if (step === 3) { // Country
+      const select = document.getElementById('country-select');
+      const inputOther = document.getElementById('country-other');
+      const emojiDiv = document.getElementById('country-emoji');
       const btnNext = document.getElementById('btn-next');
       document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
       
-      document.querySelectorAll('.selectable').forEach(el => {
-        el.addEventListener('click', () => {
-          el.classList.toggle('selected');
-          const val = el.dataset.val;
-          if (selections.includes(val)) {
-            selections.splice(selections.indexOf(val), 1);
-          } else {
-            selections.push(val);
-          }
-          if (selections.length > 0) {
+      const checkValid = () => {
+        if (select.value === 'Other') {
+          if (inputOther.value.trim().length > 0) {
             btnNext.style.opacity = '1';
             btnNext.style.pointerEvents = 'auto';
           } else {
             btnNext.style.opacity = '0.5';
             btnNext.style.pointerEvents = 'none';
           }
-        });
-      });
-      btnNext.addEventListener('click', () => { step++; updateStep(); });
-    } else if (step === 3) {
-      const select = document.getElementById('country-select');
-      const btnNext = document.getElementById('btn-next');
-      const emojiDiv = document.getElementById('country-emoji');
-      
-      document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
-      
-      select.addEventListener('change', (e) => {
-        if (e.target.value) {
+        } else if (select.value) {
           btnNext.style.opacity = '1';
           btnNext.style.pointerEvents = 'auto';
-          // Extract emoji
+        }
+      };
+
+      select.addEventListener('change', (e) => {
+        if (e.target.value === 'Other') {
+          inputOther.classList.remove('hidden');
+          emojiDiv.innerText = '🌎';
+        } else {
+          inputOther.classList.add('hidden');
           emojiDiv.innerText = e.target.value.split(" ")[0]; 
         }
+        checkValid();
       });
 
+      inputOther.addEventListener('input', checkValid);
+
       btnNext.addEventListener('click', () => { 
-        appState.country = select.value;
+        data.country = select.value === 'Other' ? inputOther.value.trim() : select.value;
         step++; 
         updateStep(); 
       });
-    } else if (step === 4) {
+    } else if (step === 4) { // Relationship
+      bindSingleSelect('relationship');
+    } else if (step === 5) { // Battles
+      bindSingleSelect('battles');
+    } else if (step === 6) { // Frequency
+      bindSingleSelect('frequency');
+    } else if (step === 7) { // Feelings (Multi Select)
+        const btnNext = document.getElementById('btn-next');
+        document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
+        document.querySelectorAll('.selectable-multi').forEach(el => {
+          el.addEventListener('click', () => {
+            el.classList.toggle('selected');
+            const val = el.dataset.val;
+            if (data.feelings.includes(val)) {
+              data.feelings.splice(data.feelings.indexOf(val), 1);
+            } else {
+              data.feelings.push(val);
+            }
+            if (data.feelings.length > 0) {
+              btnNext.style.opacity = '1';
+              btnNext.style.pointerEvents = 'auto';
+            } else {
+              btnNext.style.opacity = '0.5';
+              btnNext.style.pointerEvents = 'none';
+            }
+          });
+        });
+        btnNext.addEventListener('click', () => { step++; updateStep(); });
+    } else if (step === 8) { // Why
       const whyInput = document.getElementById('why-input');
       const btnNext = document.getElementById('btn-next');
-      
       document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
       
       whyInput.addEventListener('input', (e) => {
@@ -279,10 +388,20 @@ function renderOnboarding() {
           btnNext.style.pointerEvents = 'none';
         }
       });
-      
       btnNext.addEventListener('click', () => {
-        appState.battles = selections;
-        appState.why = whyInput.value.trim();
+        data.why = whyInput.value.trim();
+        step++; updateStep();
+      });
+    } else if (step === 9) { // Acceptance
+      document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
+      document.getElementById('btn-next').addEventListener('click', () => {
+        appState.age = data.age;
+        appState.country = data.country;
+        appState.relationship = data.relationship;
+        appState.battles = data.battles;
+        appState.frequency = data.frequency;
+        appState.feelings = data.feelings;
+        appState.why = data.why;
         appState.isFirstLaunch = false;
         appState.startDate = new Date().toISOString();
         saveState();
@@ -644,8 +763,16 @@ function renderSettings() {
       </div>
       
       <div class="card text-left mb-2">
+        <span class="card-label">Your Demographics</span>
+        <p style="font-size:0.9rem; color:var(--text-white)"><strong>Age:</strong> ${appState.age || 'Unknown'}</p>
+        <p style="font-size:0.9rem; color:var(--text-white)"><strong>Status:</strong> ${appState.relationship || 'Unknown'}</p>
+        <p style="font-size:0.9rem; color:var(--text-white)"><strong>Country:</strong> ${appState.country || 'Unknown'}</p>
+      </div>
+
+      <div class="card text-left mb-2">
         <span class="card-label">Your Battle</span>
-        <p>${appState.battles.join(' & ') || 'Not set'}</p>
+        <p style="font-size:0.9rem; color:var(--text-white)"><strong>Focus:</strong> ${appState.battles.join(' & ') || 'Not set'}</p>
+        <p style="font-size:0.9rem; color:var(--text-white)"><strong>Frequency:</strong> ${appState.frequency || 'Unknown'}</p>
       </div>
 
       <div class="card text-left mb-2">

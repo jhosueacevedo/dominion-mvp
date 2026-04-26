@@ -369,10 +369,10 @@ input[type="text"]:focus, textarea:focus {
   border-radius: 50%;
 }
 
-.selectable {
+.selectable, .selectable-multi {
   cursor: pointer;
 }
-.selectable.selected {
+.selectable.selected, .selectable-multi.selected {
   border-color: var(--primary-accent);
   background: rgba(249, 115, 22, 0.1);
 }
