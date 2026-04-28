@@ -72,6 +72,8 @@ const MISSIONS = [
   { day: 7, title: "One Week of Dominion", text: "You've proven it is possible. The foundation is laid. Now, we build. Stay vigilant; the first weekend is often the hardest." }
 ];
 
+const GLOBAL_COUNTRIES = ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea (North)", "Korea (South)", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Macedonia", "Norway", "Oman", "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"];
+
 // ===============================
 // ROUTER & CORE UI CONTROLLER
 // ===============================
@@ -84,7 +86,7 @@ function navigateTo(screen, props = {}) {
   mainContent.innerHTML = '';
   
   // Manage navigation visibility
-  if (['splash', 'onboarding', 'sos', 'mission_active'].includes(screen)) {
+  if (['splash', 'onboarding', 'sos', 'mission_active', 'welcome'].includes(screen)) {
     topbar.classList.add('hidden');
     bottomNav.classList.add('hidden');
   } else {
@@ -108,6 +110,7 @@ function navigateTo(screen, props = {}) {
     case 'mission': renderMissionList(); break;
     case 'mission_active': renderMissionActive(props.day || 1); break;
     case 'sos': renderSOSFlow(); break;
+    case 'welcome': renderWelcome(); break;
     case 'journey': renderJourney(); break;
     case 'settings-page': renderSettings(); break;
   }
@@ -186,19 +189,10 @@ function renderOnboarding() {
       container.innerHTML = `
         <h1 class="mb-2">Where are you fighting from?</h1>
         <p class="mb-4">Select your location.</p>
-        <select id="country-select" style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color); margin-bottom: 0.5rem;">
-          <option value="" disabled selected>Select a country...</option>
-          <option value="🇺🇸 United States">United States</option>
-          <option value="🇲🇽 Mexico">Mexico</option>
-          <option value="🇨🇴 Colombia">Colombia</option>
-          <option value="🇦🇷 Argentina">Argentina</option>
-          <option value="🇪🇸 Spain">Spain</option>
-          <option value="🇨🇱 Chile">Chile</option>
-          <option value="🇵🇪 Peru">Peru</option>
-          <option value="Other">Other</option>
-        </select>
-        <input type="text" id="country-other" class="hidden mt-2" placeholder="Type your country...">
-        <div id="country-emoji" style="font-size: 5rem; text-align: center; margin-top: 1rem; margin-bottom: 2rem; min-height: 80px;"></div>
+        <div style="position:relative; width:100%; margin-bottom: 2rem;">
+          <input type="text" id="country-input" autocomplete="off" placeholder="Type your country..." style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color);">
+          <div id="country-autocomplete-list" class="autocomplete-list"></div>
+        </div>
         <div class="flex gap-2 mt-auto">
           <button id="btn-back-step" class="btn btn-ghost" style="flex:1;">Back</button>
           <button id="btn-next" class="btn btn-primary" style="flex:2; opacity: 0.5; pointer-events: none;">Continue</button>
@@ -307,42 +301,60 @@ function renderOnboarding() {
     } else if (step === 2) { // Age
       bindSingleSelect('age');
     } else if (step === 3) { // Country
-      const select = document.getElementById('country-select');
-      const inputOther = document.getElementById('country-other');
-      const emojiDiv = document.getElementById('country-emoji');
+      const input = document.getElementById('country-input');
+      const listContainer = document.getElementById('country-autocomplete-list');
       const btnNext = document.getElementById('btn-next');
       document.getElementById('btn-back-step').addEventListener('click', () => { step--; updateStep(); });
       
       const checkValid = () => {
-        if (select.value === 'Other') {
-          if (inputOther.value.trim().length > 0) {
-            btnNext.style.opacity = '1';
-            btnNext.style.pointerEvents = 'auto';
-          } else {
-            btnNext.style.opacity = '0.5';
-            btnNext.style.pointerEvents = 'none';
-          }
-        } else if (select.value) {
+        if (input.value.trim().length >= 2) {
           btnNext.style.opacity = '1';
           btnNext.style.pointerEvents = 'auto';
+        } else {
+          btnNext.style.opacity = '0.5';
+          btnNext.style.pointerEvents = 'none';
         }
       };
 
-      select.addEventListener('change', (e) => {
-        if (e.target.value === 'Other') {
-          inputOther.classList.remove('hidden');
-          emojiDiv.innerText = '🌎';
+      input.addEventListener('input', (e) => {
+        const val = e.target.value.toLowerCase();
+        listContainer.innerHTML = '';
+        if (!val || val.length < 1) {
+          listContainer.classList.remove('active');
+          checkValid();
+          return;
+        }
+        
+        const matches = GLOBAL_COUNTRIES.filter(c => c.toLowerCase().includes(val));
+        if (matches.length > 0) {
+          listContainer.classList.add('active');
+          matches.slice(0, 8).forEach(match => {
+            const item = document.createElement('div');
+            item.className = 'autocomplete-item';
+            const regex = new RegExp(`(${val})`, "gi");
+            item.innerHTML = match.replace(regex, `<span style="color:var(--primary-accent);">$1</span>`);
+            item.addEventListener('click', () => {
+              input.value = match;
+              listContainer.classList.remove('active');
+              checkValid();
+            });
+            listContainer.appendChild(item);
+          });
         } else {
-          inputOther.classList.add('hidden');
-          emojiDiv.innerText = e.target.value.split(" ")[0]; 
+          listContainer.classList.remove('active');
         }
         checkValid();
       });
 
-      inputOther.addEventListener('input', checkValid);
+      // Hide autocomplete if clicked outside
+      document.addEventListener('click', (e) => {
+        if (e.target !== input) {
+          listContainer.classList.remove('active');
+        }
+      });
 
       btnNext.addEventListener('click', () => { 
-        data.country = select.value === 'Other' ? inputOther.value.trim() : select.value;
+        data.country = input.value.trim();
         step++; 
         updateStep(); 
       });
@@ -402,10 +414,9 @@ function renderOnboarding() {
         appState.frequency = data.frequency;
         appState.feelings = data.feelings;
         appState.why = data.why;
-        appState.isFirstLaunch = false;
-        appState.startDate = new Date().toISOString();
+        // Do NOT trigger isFirstLaunch override here yet, rely on welcome screen.
         saveState();
-        navigateTo('home');
+        navigateTo('welcome');
       });
     }
   };
@@ -816,3 +827,45 @@ function renderSettings() {
 
 // Boot up
 navigateTo('splash');
+
+// ===============================
+// 8. Welcome Cinematic
+// ===============================
+function renderWelcome() {
+  mainContent.innerHTML = `
+    <div class="screen text-center flex-col justify-center items-center" style="background:#090808; padding: 2rem;">
+      
+      <p class="anim-fade-up" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 11px; color: #f97316; letter-spacing: 6px; text-transform: uppercase; margin-bottom: 2rem; animation-delay: 0ms;">DOMINION</p>
+      
+      <h1 class="anim-fade-up" style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 32px; color: #faf7f4; margin-bottom: 2rem; line-height: 1.2; animation-delay: 800ms;">It takes courage to be here.</h1>
+      
+      <p class="anim-fade-up" style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 16px; color: #a89890; line-height: 1.9; margin-bottom: 2rem; animation-delay: 1400ms;">
+        Most men never make it this far.<br>
+        They live with it in silence.<br>
+        You chose differently.
+      </p>
+
+      <p class="anim-fade-up" style="font-family: 'DM Sans', sans-serif; font-weight: 400; font-size: 18px; color: #faf7f4; margin-bottom: 3rem; animation-delay: 2000ms;">This is where the real change begins.</p>
+      
+      <p class="anim-fade-up" style="font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 11px; color: #f97316; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 2rem; animation-delay: 2800ms;">YOUR JOURNEY STARTS NOW</p>
+
+      <button id="btn-enter" class="anim-fade-up" style="width: 100%; background: #f97316; color: #000; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 15px; letter-spacing: 2px; border-radius: 8px; padding: 18px; border: none; cursor: pointer; animation-delay: 3400ms;">Enter DOMINION</button>
+
+    </div>
+  `;
+
+  const btnEnter = document.getElementById('btn-enter');
+  
+  // Protect against skipping via JS fallback as required
+  btnEnter.style.pointerEvents = 'none';
+  setTimeout(() => { 
+    if(btnEnter) btnEnter.style.pointerEvents = 'auto'; 
+  }, 3400);
+
+  btnEnter.addEventListener('click', () => {
+    appState.isFirstLaunch = false;
+    appState.startDate = new Date().toISOString();
+    saveState();
+    navigateTo('home');
+  });
+}
