@@ -168,10 +168,21 @@ function renderOnboarding() {
     
     // UI Templates
     if (step === 1) { // Intro
+      container.className = 'screen flex-col justify-center items-center text-center';
       container.innerHTML = `
-        <h1 class="text-center">Your Life.<br>Your Purpose.<br>Your Dominion.</h1>
-        <p class="text-center mt-4 mb-4">A daily system built to help you become who you were always called to be.</p>
-        <button id="btn-next" class="btn btn-primary mt-auto">Get Started</button>
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+          <h1 class="anim-fade-up" style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 38px; color: #fff; margin: 0; line-height: 1.2; animation-delay: 0ms;">Your Life.</h1>
+          <h1 class="anim-fade-up" style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 38px; color: #fff; margin: 0; line-height: 1.2; animation-delay: 500ms;">Your Purpose.</h1>
+          <h1 class="anim-fade-up" style="font-family: 'Syne', sans-serif; font-weight: 700; font-size: 38px; color: #f97316; margin: 0; line-height: 1.2; animation-delay: 1000ms;">Your Dominion.</h1>
+          
+          <div class="anim-expand-line" style="height: 1px; background: #f97316; margin: 2rem auto; animation-delay: 1800ms;"></div>
+          
+          <p class="anim-fade-up" style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 14px; color: #a89890; margin: 0 auto 3rem auto; max-width: 280px; line-height: 1.6; animation-delay: 2300ms;">
+            We don't help men become better. We help them become who they were always called to be.
+          </p>
+
+          <button id="btn-next" class="anim-fade-up btn btn-primary" style="width: 100%; border-radius: 8px; animation-delay: 3100ms;">Get Started</button>
+        </div>
       `;
     } else if (step === 2) { // Age
       container.innerHTML = `
@@ -187,7 +198,7 @@ function renderOnboarding() {
       `;
     } else if (step === 3) { // Country
       container.innerHTML = `
-        <h1 class="mb-2">Where are you fighting from?</h1>
+        <h1 class="mb-2">Where are you joining from?</h1>
         <p class="mb-4">Select your location.</p>
         <div style="position:relative; width:100%; margin-bottom: 2rem;">
           <input type="text" id="country-input" autocomplete="off" placeholder="Type your country..." style="width: 100%; padding: 1rem; border-radius: 8px; font-size: 1rem; background: var(--surface-color); color: var(--text-white); border: 1px solid var(--border-color);">
@@ -297,7 +308,10 @@ function renderOnboarding() {
     };
 
     if (step === 1) {
-      document.getElementById('btn-next').addEventListener('click', () => { step++; updateStep(); });
+      const btnNext = document.getElementById('btn-next');
+      btnNext.style.pointerEvents = 'none';
+      setTimeout(() => { if (btnNext) btnNext.style.pointerEvents = 'auto'; }, 3100);
+      btnNext.addEventListener('click', () => { step++; updateStep(); });
     } else if (step === 2) { // Age
       bindSingleSelect('age');
     } else if (step === 3) { // Country
