@@ -178,7 +178,7 @@ function renderOnboarding() {
           <div class="anim-expand-line" style="height: 1px; background: #f97316; margin: 2rem auto; animation-delay: 1800ms;"></div>
           
           <p class="anim-fade-up" style="font-family: 'DM Sans', sans-serif; font-weight: 300; font-size: 14px; color: #a89890; margin: 0 auto 3rem auto; max-width: 280px; line-height: 1.6; animation-delay: 2300ms;">
-            We don't help men become better. We help them become who they were always called to be.
+            We help men become who they were always called to be.
           </p>
 
           <button id="btn-next" class="anim-fade-up btn btn-primary" style="width: 100%; border-radius: 8px; animation-delay: 3100ms;">Get Started</button>
